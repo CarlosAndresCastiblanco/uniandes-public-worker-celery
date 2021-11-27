@@ -2,10 +2,15 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 import os
+from pydub import AudioSegment
+from pydub.utils import which
+from flaskr.models import update_processed
 
 sso_region = os.getenv('SSO_REGION')
 queue_url = os.getenv('SQS_QUEUE_URL')
+sso_bucket_s3 = os.getenv('SSO_BUCKET_S3')
 
+AudioSegment.converter = which("ffmpeg")
 
 def create_bucket(bucket_name, region):
     """Create an S3 bucket in a specified region
@@ -130,10 +135,9 @@ def delete_object(bucket, region, object_name):
 
 
 def receive_and_delete_messages_queue():
-    # Create SQS client
+
     sqs = boto3.client('sqs', region_name=sso_region)
 
-    # Receive message from SQS queue
     response = sqs.receive_message(
         QueueUrl=queue_url,
         AttributeNames=[
@@ -146,28 +150,49 @@ def receive_and_delete_messages_queue():
         VisibilityTimeout=0,
         WaitTimeSeconds=0
     )
-
-    print("response............ ", response)
-
-    print("Messages............ ", response['Messages'])
-
-    print("After if_________")
-
     message = response['Messages'][0]
     receipt_handle = message['ReceiptHandle']
 
     body = message['Body']
     print("body......... ", body)
 
-    title = message['MessageAttributes']['Title']
+    title = message['MessageAttributes']['Title']['StringValue']
     print("title......... ", title)
 
-    author = message['MessageAttributes']['Author']
+    author = message['MessageAttributes']['Author']['StringValue']
     print("author......... ", author)
 
-    # Delete received message from queue
+    try:
+        if find_object(sso_bucket_s3, sso_region,
+                       "origin-{}-{}.{}".format(author, title, body.split(",")[0])):
+            downloading_files(
+                'originales/{}'.format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
+                sso_bucket_s3,
+                "origin-{}-{}.{}".format(author, title, body.split(",")[1]),
+                sso_region
+            )
+            archivo = AudioSegment.from_file(
+                "originales/origin-{}-{}.{}".format(author, title, body.split(",")[0]),
+                body.split(",")[0])
+            archivo.export(
+                "originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+                format=body.split(",")[1])
+            print('convertido satisfactoriamente',
+                  "destino-{}-{}.{}".format(author, title, body.split(",")[1]))
+            upload_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+                        sso_bucket_s3,
+                        "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+                        sso_region)
+            remove_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
+            update_processed(title)
+        else:
+            print("Archivo no encontrado en S3")
+    except Exception as err:
+        print('error convirtiendo')
+        print(err)
+        print(err.args)
+
     sqs.delete_message(
         QueueUrl=queue_url,
         ReceiptHandle=receipt_handle
     )
-    print('Received and deleted message: %s' % message)
