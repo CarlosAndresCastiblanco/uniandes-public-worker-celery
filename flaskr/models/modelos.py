@@ -41,7 +41,7 @@ def find_conversion():
 
 def update_processed(id_conversion):
     print("In update_processed "+id_conversion)
-    conversion = session.query(Conversion).filter(Conversion.id.in_([id_conversion])).all()
+    conversion = session.query(Conversion).filter(Conversion.id == id_conversion).first()
     print("conversion ",str(conversion))
     conversion.estado = "processed"
     session.commit()
