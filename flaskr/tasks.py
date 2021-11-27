@@ -21,7 +21,7 @@ appC.conf.timezone = 'UTC'
 def test():
     vistas = Vistas()
     result = find_conversion()
-    print('size query............. ',len(result))
+    print('size query............. '+len(result))
     vistas.get()
     """
     for row in result:
