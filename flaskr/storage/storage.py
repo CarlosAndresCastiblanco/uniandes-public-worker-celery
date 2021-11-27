@@ -166,6 +166,12 @@ def receive_and_delete_messages_queue():
     author = message['MessageAttributes']['Author']['StringValue']
     print("author......... ", author)
 
+    origen = body.split(",")[0]
+    print("First..."+origen)
+
+    destino = body.split(",")[1]
+    print("Second..."+destino)
+
     try:
         if find_object(sso_bucket_s3, sso_region,
                        "origin-{}-{}.{}".format(author, title, body.split(",")[0])):
