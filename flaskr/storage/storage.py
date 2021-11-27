@@ -170,7 +170,7 @@ def receive_and_delete_messages_queue():
         if find_object(sso_bucket_s3, sso_region,
                        "origin-{}-{}.{}".format(author, title, body.split(",")[0])):
             downloading_files(
-                "{}".format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
+                'originales/{}'.format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
                 sso_bucket_s3,
                 "origin-{}-{}.{}".format(author, title, body.split(",")[1]),
                 sso_region
