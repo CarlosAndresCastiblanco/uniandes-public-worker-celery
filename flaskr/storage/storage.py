@@ -4,7 +4,6 @@ from botocore.exceptions import ClientError
 import os
 from pydub import AudioSegment
 from pydub.utils import which
-
 from models import update_processed
 
 sso_region = os.getenv('SSO_REGION')
@@ -196,16 +195,14 @@ def receive_and_delete_messages_queue():
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
             remove_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
-            # update_processed(title)
-            return title
+            update_processed(title)
+            sqs.delete_message(
+                QueueUrl=queue_url,
+                ReceiptHandle=receipt_handle
+            )
         else:
             print("Archivo no encontrado en S3")
     except Exception as err:
         print('error convirtiendo')
         print(err)
         print(err.args)
-
-    sqs.delete_message(
-        QueueUrl=queue_url,
-        ReceiptHandle=receipt_handle
-    )

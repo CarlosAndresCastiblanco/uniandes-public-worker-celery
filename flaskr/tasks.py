@@ -22,10 +22,13 @@ def test():
     vistas = Vistas()
     result = find_conversion()
     print('size query............. '+str(len(result)))
+    vistas.get()
+    """
     r = vistas.get()
     print("r______"+str(r))
     if r != None:
         update_processed(r)
+    """
     """
     for row in result:
         print('row.................... ',row)
