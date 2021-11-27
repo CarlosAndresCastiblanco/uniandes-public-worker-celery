@@ -9,6 +9,7 @@ from models import update_processed
 sso_region = os.getenv('SSO_REGION')
 queue_url = os.getenv('SQS_QUEUE_URL')
 sso_bucket_s3 = os.getenv('SSO_BUCKET_S3')
+origin_folder = os.getenv('ORIGIN_FOLDER')
 
 AudioSegment.converter = which("ffmpeg")
 
@@ -166,24 +167,24 @@ def receive_and_delete_messages_queue():
         if find_object(sso_bucket_s3, sso_region,
                        "origin-{}-{}.{}".format(author, title, body.split(",")[0])):
             downloading_files(
-                'originales/{}'.format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
+                origin_folder+'{}'.format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
                 sso_bucket_s3,
                 "origin-{}-{}.{}".format(author, title, body.split(",")[1]),
                 sso_region
             )
             archivo = AudioSegment.from_file(
-                "originales/origin-{}-{}.{}".format(author, title, body.split(",")[0]),
+                origin_folder+"origin-{}-{}.{}".format(author, title, body.split(",")[0]),
                 body.split(",")[0])
             archivo.export(
-                "originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+                origin_folder+"destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                 format=body.split(",")[1])
             print('convertido satisfactoriamente',
                   "destino-{}-{}.{}".format(author, title, body.split(",")[1]))
-            upload_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+            upload_file(origin_folder+"destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_bucket_s3,
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
-            remove_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
+            remove_file(origin_folder+"destino-{}-{}.{}".format(author, title, body.split(",")[1]))
             update_processed(title)
         else:
             print("Archivo no encontrado en S3")
