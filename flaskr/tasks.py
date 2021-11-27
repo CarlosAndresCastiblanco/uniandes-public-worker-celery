@@ -23,7 +23,7 @@ def test():
     result = find_conversion()
     print('size query............. '+str(len(result)))
     r = vistas.get()
-    print("r______"+r)
+    print("r______"+str(r))
     update_processed(r)
     """
     for row in result:
