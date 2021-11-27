@@ -206,3 +206,37 @@ def receive_and_delete_messages_queue():
         print('error convirtiendo')
         print(err)
         print(err.args)
+
+
+def conversion_background(conversion):
+
+    try:
+        if find_object(sso_bucket_s3, sso_region,
+                       "origin-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.origen)):
+            downloading_files(
+                'originales/{}'.format("origin-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.origen)),
+                sso_bucket_s3,
+                "origin-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.origen),
+                sso_region
+            )
+            archivo = AudioSegment.from_file(
+                "originales/origin-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.origen),
+                conversion.origen)
+            print("AudioSegment.from_file")
+            archivo.export(
+                "originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
+                format=conversion.destino)
+            print('convertido satisfactoriamente' +
+                  "destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
+            upload_file("originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
+                        sso_bucket_s3,
+                        "destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
+                        sso_region)
+            remove_file("originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
+            update_processed(conversion.id)
+        else:
+            print("Archivo no encontrado en S3")
+    except Exception as err:
+        print('error convirtiendo')
+        print(err)
+        print(err.args)

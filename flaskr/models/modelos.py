@@ -39,6 +39,9 @@ class Conversion(Base):
 def find_conversion():
     return session.query(Conversion).filter(Conversion.estado.in_(['uploaded'])).all()
 
+def find_conversion_each_in_progress():
+    return session.query(Conversion).filter(Conversion.estado.in_(['uploaded'])).first()
+
 def update_processed(id_conversion):
     print("In update_processed "+id_conversion)
     c = session.query(Conversion).filter_by(id=id_conversion).first()

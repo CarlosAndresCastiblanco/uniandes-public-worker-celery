@@ -14,53 +14,23 @@ appC.conf.beat_schedule = {
         'task': 'tasks.add',
         'schedule': 10,
     },
+    'add-every-30-seconds': {
+        'task': 'tasks.back',
+        'schedule': 30,
+    },
 }
 appC.conf.timezone = 'UTC'
 
 @appC.task(name="tasks.add")
 def test():
     vistas = Vistas()
+    vistas.broker()
+
+@appC.task(name="tasks.back")
+def background():
+    vistas = Vistas()
     result = find_conversion()
     print('size query............. '+str(len(result)))
-    vistas.get()
-    """
-    r = vistas.get()
-    print("r______"+str(r))
-    if r != None:
-        update_processed(r)
-    """
-    """
-    for row in result:
-        print('row.................... ',row)
-        if row.estado == 'uploaded':
-            try:
-                if find_object('uniandes-bucket-s3', 'us-east-1',
-                               "origin-{}-{}.{}".format(row.usuario_id, row.id, row.origen)):
-                    downloading_files(
-                        'originales/{}'.format("origin-{}-{}.{}".format(row.usuario_id, row.id, row.origen)),
-                        'uniandes-bucket-s3',
-                        "origin-{}-{}.{}".format(row.usuario_id, row.id, row.origen),
-                        'us-east-1'
-                    )
-                    archivo = AudioSegment.from_file(
-                        "originales/origin-{}-{}.{}".format(row.usuario_id, row.id, row.origen),
-                        str(row.origen))
-                    archivo.export(
-                        "originales/destino-{}-{}.{}".format(row.usuario_id, row.id, row.destino),
-                        format=row.destino)
-                    print('convertido satisfactoriamente',
-                          "destino-{}-{}.{}".format(row.usuario_id, row.id, row.destino))
-                    upload_file("originales/destino-{}-{}.{}".format(row.usuario_id, row.id, row.destino),
-                                'uniandes-bucket-s3',
-                                "destino-{}-{}.{}".format(row.usuario_id, row.id, row.destino),
-                                'us-east-1')
-                    remove_file("originales/destino-{}-{}.{}".format(row.usuario_id, row.id, row.destino))
-                    row.estado = "processed"
-                    session.commit()
-                else:
-                    print("Archivo no encontrado en S3")
-            except Exception as err:
-                print('error convirtiendo')
-                print(err)
-                print(err.args)
-    """
+    obc = find_conversion_each_in_progress()
+    print('obj background............. ' + str(obc))
+    vistas.background(obc)
