@@ -167,24 +167,24 @@ def receive_and_delete_messages_queue():
         if find_object(sso_bucket_s3, sso_region,
                        "origin-{}-{}.{}".format(author, title, body.split(",")[0])):
             downloading_files(
-                origin_folder+'{}'.format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
+                "./originales/{}".format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
                 sso_bucket_s3,
                 "origin-{}-{}.{}".format(author, title, body.split(",")[1]),
                 sso_region
             )
             archivo = AudioSegment.from_file(
-                origin_folder+"origin-{}-{}.{}".format(author, title, body.split(",")[0]),
+                "./originales/origin-{}-{}.{}".format(author, title, body.split(",")[0]),
                 body.split(",")[0])
             archivo.export(
-                origin_folder+"destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+                "./originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                 format=body.split(",")[1])
             print('convertido satisfactoriamente',
                   "destino-{}-{}.{}".format(author, title, body.split(",")[1]))
-            upload_file(origin_folder+"destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+            upload_file("./originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_bucket_s3,
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
-            remove_file(origin_folder+"destino-{}-{}.{}".format(author, title, body.split(",")[1]))
+            remove_file("./originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
             update_processed(title)
         else:
             print("Archivo no encontrado en S3")
