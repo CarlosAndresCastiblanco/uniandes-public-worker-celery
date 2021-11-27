@@ -8,4 +8,4 @@ class Vistas():
             return result
         except:
             print("No se encontro mensaje:::::::::::::::")
-            return '', 404
+            return None
