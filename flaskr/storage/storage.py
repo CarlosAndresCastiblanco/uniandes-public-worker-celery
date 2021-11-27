@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 import os
 from pydub import AudioSegment
 from pydub.utils import which
+
 from models import update_processed
 
 sso_region = os.getenv('SSO_REGION')
@@ -12,6 +13,7 @@ sso_bucket_s3 = os.getenv('SSO_BUCKET_S3')
 origin_folder = os.getenv('ORIGIN_FOLDER')
 
 AudioSegment.converter = which("ffmpeg")
+
 
 def create_bucket(bucket_name, region):
     """Create an S3 bucket in a specified region
@@ -102,7 +104,7 @@ def get_object_name(file_name):
 def remove_file(file_name):
     if os.path.exists(file_name):
         os.remove(file_name)
-        print('Archivo removido con exito '+ file_name)
+        print('Archivo removido con exito ' + file_name)
     else:
         print('No se pudo remover el archivo')
         return 'No se pudo remover el archivo', 500
@@ -115,7 +117,7 @@ def find_object(bucket, region, object_name):
                         aws_access_key_id='AKIAVI7PUQMWA7CHFW7Q',
                         aws_secret_access_key='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')
     bucket = s3.Bucket(bucket)
-    print("I need to find......... "+ object_name)
+    print("I need to find......... " + object_name)
     a = [x for x in bucket.objects.all() if x.key == object_name]
     if len(a) > 0:
         print("in find_object..... True")
@@ -139,7 +141,6 @@ def delete_object(bucket, region, object_name):
 
 
 def receive_and_delete_messages_queue():
-
     sqs = boto3.client('sqs', region_name=sso_region)
 
     response = sqs.receive_message(
@@ -158,19 +159,19 @@ def receive_and_delete_messages_queue():
     receipt_handle = message['ReceiptHandle']
 
     body = message['Body']
-    print("body......... "+ body)
+    print("body......... " + body)
 
     title = message['MessageAttributes']['Title']['StringValue']
-    print("title......... "+ title)
+    print("title......... " + title)
 
     author = message['MessageAttributes']['Author']['StringValue']
-    print("author......... "+ author)
+    print("author......... " + author)
 
     origen = body.split(",")[0]
-    print("First..."+origen)
+    print("First..." + origen)
 
     destino = body.split(",")[1]
-    print("Second..."+destino)
+    print("Second..." + destino)
 
     try:
         if find_object(sso_bucket_s3, sso_region,
@@ -188,14 +189,15 @@ def receive_and_delete_messages_queue():
             archivo.export(
                 "originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                 format=body.split(",")[1])
-            print('convertido satisfactoriamente'+
+            print('convertido satisfactoriamente' +
                   "destino-{}-{}.{}".format(author, title, body.split(",")[1]))
             upload_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_bucket_s3,
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
             remove_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
-            update_processed(title)
+            # update_processed(title)
+            return title
         else:
             print("Archivo no encontrado en S3")
     except Exception as err:
