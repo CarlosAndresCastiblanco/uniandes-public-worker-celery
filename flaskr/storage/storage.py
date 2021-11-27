@@ -115,7 +115,7 @@ def find_object(bucket, region, object_name):
                         aws_access_key_id='AKIAVI7PUQMWA7CHFW7Q',
                         aws_secret_access_key='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')
     bucket = s3.Bucket(bucket)
-    print("in find_object i need to find......... ", object_name)
+    print("I need to find......... "+ object_name)
     a = [x for x in bucket.objects.all() if x.key == object_name]
     if len(a) > 0:
         print("in find_object..... True")
@@ -172,23 +172,23 @@ def receive_and_delete_messages_queue():
             downloading_files(
                 'originales/{}'.format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
                 sso_bucket_s3,
-                "origin-{}-{}.{}".format(author, title, body.split(",")[1]),
+                "origin-{}-{}.{}".format(author, title, body.split(",")[0]),
                 sso_region
             )
             archivo = AudioSegment.from_file(
-                "origin-{}-{}.{}".format(author, title, body.split(",")[0]),
+                "originales/origin-{}-{}.{}".format(author, title, body.split(",")[0]),
                 body.split(",")[0])
             print("AudioSegment.from_file")
             archivo.export(
-                "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+                "originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                 format=body.split(",")[1])
             print('convertido satisfactoriamente',
                   "destino-{}-{}.{}".format(author, title, body.split(",")[1]))
-            upload_file("destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+            upload_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_bucket_s3,
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
-            remove_file("destino-{}-{}.{}".format(author, title, body.split(",")[1]))
+            remove_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
             update_processed(title)
         else:
             print("Archivo no encontrado en S3")
