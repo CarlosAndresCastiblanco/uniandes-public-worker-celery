@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 import os
 from pydub import AudioSegment
 from pydub.utils import which
-from flaskr.models import update_processed
+from models import update_processed
 
 sso_region = os.getenv('SSO_REGION')
 queue_url = os.getenv('SQS_QUEUE_URL')
