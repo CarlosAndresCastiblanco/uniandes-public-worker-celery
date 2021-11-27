@@ -10,9 +10,9 @@ logger = get_task_logger(__name__)
 PATH = str(Path().absolute(), )
 
 appC.conf.beat_schedule = {
-    'add-every-60-seconds': {
+    'add-every-10-seconds': {
         'task': 'tasks.add',
-        'schedule': 60,
+        'schedule': 10,
     },
 }
 appC.conf.timezone = 'UTC'
