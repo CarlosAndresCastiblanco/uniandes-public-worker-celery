@@ -57,6 +57,7 @@ def list_buckets():
 
 
 def upload_file(file_name, bucket, object_name, region):
+    print("In upload_file")
     """Upload a file to an S3 bucket
 
     :param file_name: File to upload
@@ -80,6 +81,7 @@ def upload_file(file_name, bucket, object_name, region):
 
 
 def downloading_files(file_name, bucket, object_name, region):
+    print("In downloading_files")
     s3 = boto3.client('s3',
                       region_name=region,
                       aws_access_key_id='AKIAVI7PUQMWA7CHFW7Q',
@@ -107,6 +109,7 @@ def remove_file(file_name):
 
 
 def find_object(bucket, region, object_name):
+    print("In find_object")
     s3 = boto3.resource('s3',
                         region_name=region,
                         aws_access_key_id='AKIAVI7PUQMWA7CHFW7Q',
@@ -167,24 +170,25 @@ def receive_and_delete_messages_queue():
         if find_object(sso_bucket_s3, sso_region,
                        "origin-{}-{}.{}".format(author, title, body.split(",")[0])):
             downloading_files(
-                "../originales/{}".format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
+                "{}".format("origin-{}-{}.{}".format(author, title, body.split(",")[0])),
                 sso_bucket_s3,
                 "origin-{}-{}.{}".format(author, title, body.split(",")[1]),
                 sso_region
             )
             archivo = AudioSegment.from_file(
-                "../originales/origin-{}-{}.{}".format(author, title, body.split(",")[0]),
+                "origin-{}-{}.{}".format(author, title, body.split(",")[0]),
                 body.split(",")[0])
+            print("AudioSegment.from_file")
             archivo.export(
-                "../originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+                "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                 format=body.split(",")[1])
             print('convertido satisfactoriamente',
                   "destino-{}-{}.{}".format(author, title, body.split(",")[1]))
-            upload_file("../originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
+            upload_file("destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_bucket_s3,
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
-            remove_file("../originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
+            remove_file("destino-{}-{}.{}".format(author, title, body.split(",")[1]))
             update_processed(title)
         else:
             print("Archivo no encontrado en S3")
