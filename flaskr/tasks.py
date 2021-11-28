@@ -33,4 +33,7 @@ def background():
     print('size query............. '+str(len(result)))
     obc = find_conversion_each_in_progress()
     print('obj background............. ' + str(obc))
-    vistas.background(obc)
+    if obc != None:
+        vistas.background(obc)
+    else:
+        print('No hay objetos en background')
