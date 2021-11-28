@@ -29,7 +29,6 @@ def test():
 @appC.task(name="tasks.back")
 def background():
     vistas = Vistas()
-    result = find_conversion()
     obc = find_conversion_each_in_progress()
     if obc != None:
         vistas.background(obc)

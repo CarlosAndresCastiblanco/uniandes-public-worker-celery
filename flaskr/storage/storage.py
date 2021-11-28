@@ -101,6 +101,7 @@ def get_object_name(file_name):
 
 
 def remove_file(file_name):
+    print('In remove_file delete ' + file_name)
     if os.path.exists(file_name):
         os.remove(file_name)
         print('Archivo removido con exito ' + file_name)
@@ -188,14 +189,14 @@ def receive_and_delete_messages_queue():
             archivo.export(
                 "originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                 format=body.split(",")[1])
-            print('convertido satisfactoriamente' +
+            remove_file("originales/origin-{}-{}.{}".format(author, title, body.split(",")[0]))
+            print('convertido satisfactoriamente ' +
                   "destino-{}-{}.{}".format(author, title, body.split(",")[1]))
             upload_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_bucket_s3,
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
             remove_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
-            remove_file("originales/origin-{}-{}.{}".format(author, title, body.split(",")[1]))
             update_processed(title)
             sqs.delete_message(
                 QueueUrl=queue_url,
@@ -227,6 +228,7 @@ def conversion_background(conversion):
             archivo.export(
                 "originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
                 format=conversion.destino)
+            remove_file("originales/origin-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.origen))
             print('convertido satisfactoriamente ' +
                   "destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
             upload_file("originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
@@ -234,7 +236,6 @@ def conversion_background(conversion):
                         "destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
                         sso_region)
             remove_file("originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
-            remove_file("originales/origin-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
             update_processed(str(conversion.id))
         else:
             print("Archivo no encontrado en S3")

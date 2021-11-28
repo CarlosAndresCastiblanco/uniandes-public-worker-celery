@@ -13,4 +13,4 @@ class Vistas():
             conversion_background(conversion)
             print("Realizado:::::::::::::::")
         except:
-            print("No se encontro mensaje:::::::::::::::")
+            print("No se encontro background:::::::::::::::")
