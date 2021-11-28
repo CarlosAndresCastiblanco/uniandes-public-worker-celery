@@ -30,9 +30,7 @@ def test():
 def background():
     vistas = Vistas()
     result = find_conversion()
-    print('size query............. '+str(len(result)))
     obc = find_conversion_each_in_progress()
-    print('obj background............. ' + str(obc))
     if obc != None:
         vistas.background(obc)
     else:

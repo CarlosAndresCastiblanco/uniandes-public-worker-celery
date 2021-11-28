@@ -195,6 +195,7 @@ def receive_and_delete_messages_queue():
                         "destino-{}-{}.{}".format(author, title, body.split(",")[1]),
                         sso_region)
             remove_file("originales/destino-{}-{}.{}".format(author, title, body.split(",")[1]))
+            remove_file("originales/origin-{}-{}.{}".format(author, title, body.split(",")[1]))
             update_processed(title)
             sqs.delete_message(
                 QueueUrl=queue_url,
