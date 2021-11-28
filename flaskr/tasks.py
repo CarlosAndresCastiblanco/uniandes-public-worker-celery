@@ -1,7 +1,6 @@
 from celery import Celery
 from celery.utils.log import get_task_logger
 from pathlib import Path
-from storage import *
 from vistas import Vistas
 from models import *
 
