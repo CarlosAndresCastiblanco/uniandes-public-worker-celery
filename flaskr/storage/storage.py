@@ -9,7 +9,6 @@ from models import update_processed
 sso_region = os.getenv('SSO_REGION')
 queue_url = os.getenv('SQS_QUEUE_URL')
 sso_bucket_s3 = os.getenv('SSO_BUCKET_S3')
-origin_folder = os.getenv('ORIGIN_FOLDER')
 
 AudioSegment.converter = which("ffmpeg")
 
