@@ -226,14 +226,15 @@ def conversion_background(conversion):
             archivo.export(
                 "originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
                 format=conversion.destino)
-            print('convertido satisfactoriamente' +
+            print('convertido satisfactoriamente ' +
                   "destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
             upload_file("originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
                         sso_bucket_s3,
                         "destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino),
                         sso_region)
             remove_file("originales/destino-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
-            update_processed(conversion.id)
+            remove_file("originales/origin-{}-{}.{}".format(conversion.usuario_id, conversion.id, conversion.destino))
+            update_processed(str(conversion.id))
         else:
             print("Archivo no encontrado en S3")
     except Exception as err:
