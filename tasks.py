@@ -4,7 +4,7 @@ from pathlib import Path
 from vistas import Vistas
 from models import *
 
-appC = Celery('tasks', broker='redis://127.0.0.1:6379/0')
+appC = Celery('tasks', BROKER_URL=os.getenv('REDIS_URL'), CELERY_RESULT_BACKEND=os.getenv('REDIS_URL'))
 logger = get_task_logger(__name__)
 PATH = str(Path().absolute(), )
 
