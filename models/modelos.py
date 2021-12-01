@@ -11,7 +11,7 @@ uri_database = os.getenv('SQLALCHEMY_DATABASE_URI')
 """
 Launch DataBase
 """
-engine = create_engine(uri_database, echo=True)
+engine = create_engine("mysql+pymysql://admin:12345678@converter.cd0qbrcafg8c.us-east-1.rds.amazonaws.com:3306/converter", echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 Base = declarative_base()
